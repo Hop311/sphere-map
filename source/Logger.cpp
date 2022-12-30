@@ -6,7 +6,7 @@
 
 const char *get_filename(const char *filepath) {
 	if (filepath == nullptr) {
-		logger("path == nullptr");
+		logger("filepath == nullptr");
 		return nullptr;
 	}
 	const char *last_slash = filepath;

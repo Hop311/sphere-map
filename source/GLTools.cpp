@@ -4,17 +4,50 @@
 
 #include <vector>
 
+static const char *debug_type_name(GLenum type) {
+	switch (type) {
+#define F(X) case GL_DEBUG_TYPE_##X: return #X;
+		F(ERROR) F(DEPRECATED_BEHAVIOR) F(UNDEFINED_BEHAVIOR) F(PORTABILITY)
+		F(PERFORMANCE) F(MARKER) F(PUSH_GROUP) F(POP_GROUP) F(OTHER)
+#undef F
+	default: return "UNKNOWN";
+	}
+}
+static const char *debug_severity_name(GLenum severity) {
+	switch (severity) {
+#define F(X) case GL_DEBUG_SEVERITY_##X: return #X;
+		F(HIGH) F(MEDIUM) F(LOW) F(NOTIFICATION)
+#undef F
+	default: return "UNKNOWN";
+	}
+}
+static const char *debug_source_name(GLenum source) {
+	switch (source) {
+#define F(X) case GL_DEBUG_SOURCE_##X: return #X;
+		F(API) F(WINDOW_SYSTEM) F(SHADER_COMPILER) F(THIRD_PARTY) F(APPLICATION) F(OTHER)
+#undef F
+	default: return "UNKNOWN";
+	}
+}
 static const void *DEBUG_ID = (void *)0xDEB06;
 static void GLAPIENTRY gl_debug_output(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *user_param) {
 	if (user_param != DEBUG_ID)
-		logger("unexpected user_param: ", user_param, " (was set as ", DEBUG_ID, ").");
-	logger("source: ", source, ", type: ", type, ", id: ", id, ", severity: ", severity, ", length: ", length, ", message: ", message, ", message: ", message, ", user_param: ", user_param);
+		logger("Unexpected user_param: ", user_param, " (was set as ", DEBUG_ID, ").");
+	logger("[", debug_type_name(type), "][", debug_severity_name(severity), "][", debug_source_name(source), "] id = ", id, ", length = ", length, ":\n\n", message, "\n");
 }
 void enable_gl_debug_output() {
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(gl_debug_output, DEBUG_ID);
 }
 
+static const char *shader_type_name(GLenum type) {
+	switch (type) {
+#define F(X) case GL_##X##_SHADER: return #X;
+		F(VERTEX) F(GEOMETRY) F(FRAGMENT)
+#undef F
+	default: return "UNKNOWN";
+	}
+}
 int load_shader(GLenum shader_type, GLuint &shader, const char *source) {
 	GLint success = GL_FALSE, info_log_length = 0;
 	GLuint shader_id = glCreateShader(shader_type);
@@ -25,13 +58,13 @@ int load_shader(GLenum shader_type, GLuint &shader, const char *source) {
 	if (info_log_length > 0) {
 		std::vector<char> info_log(info_log_length);
 		glGetShaderInfoLog(shader_id, info_log_length, nullptr, info_log.data());
-		logger(shader_type, " shader info log (length ", info_log_length, "):\n\n", info_log.data());
+		logger(shader_type_name(shader_type), " shader info log (length ", info_log_length, "):\n\n", info_log.data(), "\n");
 	}
 	if (success) {
 		shader = shader_id;
 		return 0;
 	} else {
-		logger(shader_type, " shader compilation failed.");
+		logger(shader_type_name(shader_type), " shader compilation failed.");
 		glDeleteShader(shader_id);
 		shader = 0;
 		return -1;
@@ -59,7 +92,7 @@ int load_program(GLuint &program, const char *vertex_shader, const char *geometr
 	if (info_log_length > 0) {
 		std::vector<char> info_log(info_log_length);
 		glGetProgramInfoLog(program_id, info_log_length, nullptr, info_log.data());
-		logger("program info log (length ", info_log_length, "):\n\n", info_log.data());
+		logger("Program info log (length ", info_log_length, "):\n\n", info_log.data(), "\n");
 	}
 	glDeleteShader(vertex_shader_id);
 	glDeleteShader(geometry_shader_id);
@@ -68,7 +101,7 @@ int load_program(GLuint &program, const char *vertex_shader, const char *geometr
 		program = program_id;
 		return 0;
 	} else {
-		logger("program linking failed");
+		logger("Program linking failed.");
 		glDeleteShader(program_id);
 		program = 0;
 		return -1;

@@ -23,7 +23,7 @@ static struct {
 } window;
 
 static void error_callback(int err, const char *desc) {
-	logger("GLFW error ", err, ": ", desc);
+	logger("GLFW error ", err, ": ", desc, ".");
 }
 static void framebuffer_size_callback(GLFWwindow *window_ptr, int width, int height) {
 	std::lock_guard<std::mutex> guard{ input_mutex };
@@ -41,7 +41,7 @@ static void key_callback(GLFWwindow *window_ptr, int key, int scancode, int acti
 
 bool Window::init(int width, int height, const char *title) {
 	if (window.glfw_ptr) {
-		logger("Window has already been initialised!");
+		logger("Window has already been initialised.");
 		return false;
 	}
 	glfwSetErrorCallback(error_callback);
@@ -81,7 +81,7 @@ bool Window::init(int width, int height, const char *title) {
 
 void Window::deinit() {
 	if (!window.glfw_ptr) {
-		logger("Window has not been initialised!");
+		logger("Window has not been initialised.");
 		return;
 	}
 	Graphics::deinit();
@@ -149,7 +149,7 @@ void loop_function() {
 
 void Window::run() {
 	if (!window.glfw_ptr) {
-		logger("Window has not been initialised!");
+		logger("Window has not been initialised.");
 		return;
 	}
 	glfwMakeContextCurrent(nullptr);
@@ -171,5 +171,5 @@ void Window::run() {
 
 void Window::close() {
 	if (window.glfw_ptr) glfwSetWindowShouldClose(window.glfw_ptr, GL_TRUE);
-	else logger("window == nullptr");
+	else logger("Window has not been initialised.");
 }
