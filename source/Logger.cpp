@@ -4,10 +4,10 @@
 
 #include <string_view>
 
-const char *getFilename(const char *filepath) {
-	if (filepath == NULL) {
-		logger("path == NULL");
-		return NULL;
+const char *get_filename(const char *filepath) {
+	if (filepath == nullptr) {
+		logger("path == nullptr");
+		return nullptr;
 	}
 	const char *last_slash = filepath;
 	while (*filepath != '\0') {

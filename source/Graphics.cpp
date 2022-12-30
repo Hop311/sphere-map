@@ -9,7 +9,7 @@ const glm::vec3 QUAD_DATA[4] = {
 	{  0.5f, -0.5f, 0.0f },
 	{  0.5f,  0.5f, 0.0f }
 };
-const char *SHADER_VERT = R"(
+const char *const SHADER_VERT = R"(
 #version 330 core
 
 layout(location = 0) in vec3 position_in;
@@ -18,7 +18,7 @@ void main() {
 	gl_Position = vec4(position_in, 1.0f);
 }
 )";
-const char *SHADER_FRAG = R"(
+const char *const SHADER_FRAG = R"(
 #version 330 core
 
 out vec4 colour_out;
@@ -27,13 +27,6 @@ void main() {
 	colour_out = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
 )";
-
-static const void *DEBUG_ID = (void *)0xDEB06;
-void GLAPIENTRY gl_debug_output(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *user_param) {
-	if (user_param != DEBUG_ID)
-		logger("unexpected user_param: ", user_param, " (was set as ", DEBUG_ID, ").");
-	logger("source: ", source, ", type: ", type, ", id: ", id, ", severity: ", severity, ", length: ", length, ", message: ", message, ", message: ", message, ", user_param: ", user_param);
-}
 
 GLuint program = 0, vao = 0, vbo = 0;
 
@@ -44,13 +37,12 @@ bool Graphics::init() {
 		return false;
 	}
 
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(gl_debug_output, DEBUG_ID);
+	enable_gl_debug_output();
 
 	glClearColor(0.0f, 0.5f, 1.0f, 1.0f);
 
 	//Loading shaders
-	int ret = loadProgram(&program, SHADER_VERT, nullptr, SHADER_FRAG);
+	int ret = load_program(program, SHADER_VERT, nullptr, SHADER_FRAG);
 	if (ret) {
 		logger("Failed to load shaders.");
 		return false;

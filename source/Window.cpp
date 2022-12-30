@@ -54,7 +54,7 @@ bool Window::init(int width, int height, const char *title) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window.glfw_ptr = glfwCreateWindow(width, height, title, NULL, NULL);
+	window.glfw_ptr = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
 	if (!window.glfw_ptr) {
 		logger("Failed to open GLFW window.");
